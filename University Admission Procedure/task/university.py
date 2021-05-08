@@ -1,5 +1,6 @@
 
 class UniversityAdmissionProcedure:
+    """Class for processing student admissions."""
     def __init__(self):
         self.applicants_list = []
         self.accepted_applicants = None
@@ -19,27 +20,29 @@ class UniversityAdmissionProcedure:
                          'Mathematics': []}
 
     def get_criterion(self, department):
+        """Get lambda for sorting student lists."""
         return lambda student: (-(self.get_final_score(department, student)), student[0], student[1])
 
 
     def get_final_score(self, department, x):
+        """Compare exam results according to department."""
         return max(self.score_positions[department](x), x[6])
 
 
-    def input_data(self):
+    def input_data(self, filename):
+        """Read data from file."""
         self.accepted_applicants = int(input())
         self.remaining_positions = {'Engineering': self.accepted_applicants, 'Chemistry': self.accepted_applicants,
                                     'Biotech': self.accepted_applicants, 'Physics': self.accepted_applicants,
                                     'Mathematics': self.accepted_applicants}
-        with open('applicant_list_7.txt', 'r') as file:
+        with open(filename, 'r') as file:
             for line in file:
                 self.applicants_list.append(line.split())
                 for i in [2, 3, 4, 5, 6]:
                     self.applicants_list[-1][i] = float(self.applicants_list[-1][i])
 
-
     def accept_students(self):
-        self.input_data()
+        """Accept students via exam results."""
         for priority in [7, 8, 9]:
             for student in self.applicants_list:
                 self.departments[student[priority]].append(student)
@@ -55,14 +58,15 @@ class UniversityAdmissionProcedure:
                 value.clear()
 
     def save_to_file(self):
+        """Save result to files."""
         for department, students in self.accepted.items():
             with open(f'{department}.txt', 'w') as file:
                 for student in sorted(students, key=self.get_criterion(department)):
                     print(f'{student[0]} {student[1]} {self.get_final_score(department, student)}', file=file)
 
-
-
-    def main(self):
+    def main(self, filename):
+        """Starting point of a program."""
+        self.input_data(filename)
         self.accept_students()
         self.save_to_file()
         # for department, value in sorted(self.accepted.items(), key=lambda x: x[0]):
@@ -74,4 +78,4 @@ class UniversityAdmissionProcedure:
 
 if __name__ == '__main__':
     test = UniversityAdmissionProcedure()
-    test.main()
+    test.main('applicants_list_7.txt')
